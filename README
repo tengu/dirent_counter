@@ -1,0 +1,16 @@
+
+* dirent_counter 
+  recursively count the number of directory entries and report.
+
+* building
+  make
+
+* usage
+  $ sudo ./dirent_counter /var | sort -nr 
+  7300	/var/lib/dpkg/info
+  220	/var/cache/apt/archives
+  143	/var/lib/dpkg/alternatives
+  114	/var/log
+  89	/var/games
+  ...
+
