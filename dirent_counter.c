@@ -20,23 +20,27 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
+/**
+ * returns deep entry count
+ */
 int scan(const char *dirpath) 
 {
         DIR *dir;
+	int deep=0;		/* total number of entries under this node. */
 
 	dir=opendir(dirpath);
 	if (dir==NULL) {
 		perror(dirpath);
 	} else {
 		struct dirent *ent;
-		int count=0;
+		int shallow=0;	/* number of entries in current directory */
 
 		while((ent=readdir(dir))) {
-			if (strcmp(ent->d_name, ".")==0) {
-				/* ignore */
-			} else if (strcmp(ent->d_name, "..")==0) {
-				/* ignore */
-			} else if (ent->d_type==DT_DIR) {
+
+			if (strcmp(ent->d_name, ".")==0 || strcmp(ent->d_name, "..")==0)
+				continue;
+
+			if (ent->d_type==DT_DIR) {
 				char path[MAXPATHLEN];
 
 				if (dirpath[strlen(dirpath)-1]=='/') {
@@ -44,15 +48,16 @@ int scan(const char *dirpath)
 				} else {
 					snprintf(path, MAXPATHLEN, "%s/%s", dirpath, ent->d_name);
 				}
-				scan(path);
-			}	
-			count++;
+				deep+=scan(path); /* recursive call */
+			}
+			shallow++;
 		} 
+		deep+=shallow;
 		closedir(dir);
 
 		/* report */
-		printf("%d\t%s\n", count, dirpath);
+		printf("%d\t%d\t%s\n", deep, shallow, dirpath);
 	}
 	
-	return 0;
+	return deep;
 }
